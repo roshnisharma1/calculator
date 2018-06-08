@@ -1,0 +1,783 @@
+package application;
+
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import java.util.Stack;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import javafx.application.Application;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.stage.Stage;
+import javafx.scene.text.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
+
+
+public class Model extends Application {
+	public static void main(String[] args) {
+		launch(args);
+	}
+	
+	public static int evaluateExpression(String expression) {
+		Stack<Integer> operandStack = new Stack<>();
+		Stack<Character> operatorStack = new Stack<>();
+		
+		// If expression begins with a negative
+		if (expression.charAt(0) == '-') {
+			expression = "0+0-" + expression;
+		}
+		
+		expression = insertBlanks(expression);
+		String[] tokens = expression.split(" ");
+		
+		// Scan tokens and put numbers in
+		for (String token : tokens) {
+			//Blank space
+			if (token.length() == 0) {
+				continue;
+			}
+			
+			// Add numbers to operand stack
+			if (token.charAt(0) != '+' && token.charAt(0) != '-' && token.charAt(0) != '*' &&
+					token.charAt(0) != '/' && token.charAt(0) != '(' && token.charAt(0) != ')') {
+				operandStack.push(Integer.parseInt(token));
+			}
+		}
+		
+		//Scan tokens for operators
+		for (String token : tokens) {
+			// Blank space
+			if (token.length() == 0) {
+				continue;
+			}
+			
+			else if (token.charAt(0) == '+' || token.charAt(0) == '-') {
+				while (!operatorStack.isEmpty() && (operatorStack.peek() == '+' || operatorStack.peek() == '-' ||
+						operatorStack.peek() == '*' || operatorStack.peek() == '/')) {
+					processOperator(operandStack, operatorStack);
+				}
+				operatorStack.push(token.charAt(0));
+			}
+			
+			else if (token.charAt(0) == '*' || token.charAt(0) == '/') {
+				while (!operatorStack.isEmpty() && (operatorStack.peek() == '*' || operatorStack.peek() == '/')) {
+					processOperator(operandStack, operatorStack);
+				}
+				operatorStack.push(token.charAt(0));
+			}
+			
+			else if (token.trim().charAt(0) == '(') {
+				operatorStack.push('(');
+			}
+			
+			else if (token.trim().charAt(0) == ')') {
+				while (operatorStack.peek() != '(') {
+					processOperator(operandStack, operatorStack);
+				}
+				operatorStack.pop();
+			}
+		}
+		
+		// Process remaining operators in the stack
+		while (!operatorStack.isEmpty()) {
+			processOperator(operandStack, operatorStack);
+		}
+		
+		return operandStack.pop();
+	}
+	
+	public static void processOperator(Stack<Integer> operandStack, Stack<Character> operatorStack) {
+		char op = operatorStack.pop();
+		int op1 = operandStack.pop();
+		int op2 = operandStack.pop();
+		
+		if (op == '+') {
+			operandStack.push(op2 + op1);
+		}
+		
+		else if (op == '-') {
+			operandStack.push(op2 - op1);
+		}
+		
+		else if (op == '*') {
+			operandStack.push(op2 * op1);
+		}
+		
+		else if (op == '/') {
+			operandStack.push(op2 / op1);
+		}
+	}
+	
+	public static String insertBlanks(String s) {
+		String result = "";
+		
+		for (int i = 0; i < s.length(); i++) {
+			if (s.charAt(i) == '(' || s.charAt(i) == ')' || s.charAt(i) == '+' ||
+					s.charAt(i) == '-' || s.charAt(i) == '*' || s.charAt(i) == '/') {
+				result += " " + s.charAt(i) + " ";
+			}
+			else {
+				result += s.charAt(i);
+			}
+		}
+		
+		return result;
+	}
+	
+	public static String getHex(String s) {
+		int answer = Integer.parseInt(s);
+		String hexadecimal = Integer.toHexString(answer);
+		return hexadecimal.toUpperCase();
+	}
+	
+	public static String getOct(String s) {
+		int answer = Integer.parseInt(s);
+		String octal = Integer.toOctalString(answer);
+		return octal;
+	}
+	
+	public static String getBin(String s) {
+		int answer = Integer.parseInt(s);
+		String binary = Integer.toBinaryString(answer);
+		return binary;
+	}
+	
+	public void start(Stage window) {
+		window.setTitle("Calculator");
+		
+		// Create VBox
+		VBox vbox = new VBox();
+		vbox.setSpacing(0);
+		vbox.setAlignment(Pos.TOP_LEFT);
+		vbox.setPrefWidth(275);
+		vbox.setPrefHeight(480);
+		
+		// Create grid 
+		GridPane grid = new GridPane();
+		grid.setHgap(11);
+		grid.setVgap(11);
+		grid.setPrefHeight(400);
+		grid.setPrefWidth(275);
+		grid.setPadding(new Insets(0,0,0,0));
+		grid.setAlignment(Pos.CENTER);
+		grid.setStyle("-fx-background-color: silver");
+				
+		// Create buttons
+		Button left_parentheses = new Button("(");
+		Button right_parentheses = new Button(")");
+		Button plus_minus = new Button("±");
+		Button zero = new Button("0");
+		Button decimal = new Button(".");
+		Button equals = new Button("=");
+		Button letter_e = new Button("E");
+		Button letter_f = new Button("F");
+		Button one = new Button ("1");
+		Button two = new Button ("2");
+		Button three = new Button("3");
+		Button plus = new Button("+");
+		Button letter_c = new Button("C");
+		Button letter_d = new Button("D");
+		Button four = new Button("4");
+		Button five = new Button("5");
+		Button six = new Button("6");
+		Button minus = new Button("-");
+		Button letter_a = new Button("A");
+		Button letter_b = new Button("B");
+		Button seven = new Button("7");
+		Button eight = new Button("8");
+		Button nine = new Button("9");
+		Button multiply = new Button("×");
+		Button up_arrow = new Button("↑");
+		Button mod = new Button("Mod");
+		//mod.setStyle("-fx-font: 10 arial");
+		Button ce = new Button("CE");
+		//ce.setStyle("-fx-font: 10 arial");
+		Button c = new Button("C");
+		//c.setStyle("-fx-font: 10 arial");
+		Button backspace = new Button("⌫");
+		Button divide = new Button("÷");
+		Button lsh = new Button("Lsh");
+		//lsh.setStyle("-fx-font: 10 arial");
+		Button rsh = new Button("Rsh");
+		//rsh.setStyle("-fx-font: 10 arial");
+		Button or = new Button("Or");
+		//or.setStyle("-fx-font: 10 arial");
+		Button xor = new Button("Xor");
+		//xor.setStyle("-fx-font: 10 arial");
+		Button not = new Button("Not");
+		//not.setStyle("-fx-font: 10 arial");
+		Button and = new Button("And");
+		//and.setStyle("-fx-font: 10 arial");
+		
+		// Style buttons
+		left_parentheses.getStylesheets().add("Style1.css");
+		right_parentheses.getStylesheets().add("Style1.css");
+		plus_minus.getStylesheets().add("Style1.css");
+		zero.getStylesheets().add("Style1.css");
+		decimal.getStylesheets().add("Style1.css");
+		equals.getStylesheets().add("Style1.css");
+		letter_e.getStylesheets().add("Style1.css");
+		letter_f.getStylesheets().add("Style1.css");
+		one.getStylesheets().add("Style1.css");
+		two.getStylesheets().add("Style1.css");
+		three.getStylesheets().add("Style1.css");
+		plus.getStylesheets().add("Style1.css");
+		letter_c.getStylesheets().add("Style1.css");
+		letter_d.getStylesheets().add("Style1.css");
+		four.getStylesheets().add("Style1.css");
+		five.getStylesheets().add("Style1.css");
+		six.getStylesheets().add("Style1.css");
+		minus.getStylesheets().add("Style1.css");
+		letter_a.getStylesheets().add("Style1.css");
+		letter_b.getStylesheets().add("Style1.css");
+		seven.getStylesheets().add("Style1.css");
+		eight.getStylesheets().add("Style1.css");
+		nine.getStylesheets().add("Style1.css");
+		multiply.getStylesheets().add("Style1.css");
+		up_arrow.getStylesheets().add("Style1.css");
+		mod.getStylesheets().add("Style2.css");
+		ce.getStylesheets().add("Style2.css");
+		c.getStylesheets().add("Style2.css");
+		backspace.getStylesheets().add("Style1.css");
+		divide.getStylesheets().add("Style1.css");
+		lsh.getStylesheets().add("Style2.css");
+		rsh.getStylesheets().add("Style2.css");
+		or.getStylesheets().add("Style2.css");
+		xor.getStylesheets().add("Style2.css");
+		not.getStylesheets().add("Style2.css");
+		and.getStylesheets().add("Style2.css");
+		
+		// Add buttons to grid
+		grid.add(left_parentheses, 0, 5);
+		grid.add(right_parentheses, 1, 5);
+		grid.add(plus_minus, 2, 5);
+		grid.add(zero, 3, 5);
+		grid.add(decimal, 4, 5);
+		grid.add(equals, 5, 5);
+		grid.add(letter_e, 0, 4);
+		grid.add(letter_f, 1, 4);
+		grid.add(one, 2, 4);
+		grid.add(two, 3, 4);
+		grid.add(three, 4, 4);
+		grid.add(plus, 5, 4);
+		grid.add(letter_c, 0, 3);
+		grid.add(letter_d, 1, 3);
+		grid.add(four, 2, 3);
+		grid.add(five, 3, 3);
+		grid.add(six, 4, 3);
+		grid.add(minus, 5, 3);
+		grid.add(letter_a, 0, 2);
+		grid.add(letter_b, 1, 2);
+		grid.add(seven, 2, 2);
+		grid.add(eight, 3, 2);
+		grid.add(nine, 4, 2);
+		grid.add(multiply, 5, 2);
+		grid.add(up_arrow, 0, 1);
+		grid.add(mod, 1, 1);
+		grid.add(ce, 2, 1);
+		grid.add(c, 3, 1);
+		grid.add(backspace, 4, 1);
+		grid.add(divide, 5, 1);
+		grid.add(lsh, 0, 0);
+		grid.add(rsh, 1, 0);
+		grid.add(or, 2, 0);
+		grid.add(xor, 3, 0);
+		grid.add(not, 4, 0);
+		grid.add(and, 5, 0);
+				
+		// Create text for display of button
+		Text displayText = new Text(" ");
+		displayText.setTextAlignment(TextAlignment.RIGHT);	
+		
+		StringBuilder entry = new StringBuilder();
+		
+		// Buttons for bit conversion
+		Button hex = new Button("HEX  0");
+		Button dec = new Button("DEC  0");
+		Button oct = new Button("OCT  0");
+		Button bin = new Button("BIN   0");
+		
+		// Set action on buttons
+		left_parentheses.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				//displayText.setText("(");
+				//keys.add('(');
+				entry.append("(");
+				displayText.setText(entry.toString());
+			}
+		});
+		right_parentheses.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				//displayText.setText(")");
+				//String number = numBuilder.toString();
+				//double numberValue = Double.parseDouble(number);
+				//nums.add(numberValue);
+				//keys.add(')');
+				entry.append(")");
+				displayText.setText(entry.toString());
+			}
+		});
+		plus_minus.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				
+				StringBuilder newNumBuilder = new StringBuilder();
+				newNumBuilder.append("-");
+				newNumBuilder.append(entry);
+				entry.insert(0, "-");
+				displayText.setText(entry.toString());
+				
+			}
+		});
+		zero.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				//numBuilder.append("0");
+				//String screen = numBuilder.toString();
+				//displayText.setText(screen);
+				//keys.add('0');
+				entry.append("0");
+				displayText.setText(entry.toString());
+			}
+		});
+		decimal.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				entry.append(".");
+				displayText.setText(entry.toString());
+			}
+		});
+		equals.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				String expression = entry.toString();
+				int answer = evaluateExpression(expression);
+				displayText.setText(Integer.toString(answer));
+				
+				// Set display for bit conversions
+				String hexAns = getHex(Integer.toString(answer));
+				String hexString = "HEX  " + hexAns;
+				hex.setText(hexString);
+				String octAns = getOct(Integer.toString(answer));
+				String octString = "OCT  " + octAns;
+				oct.setText(octString);
+				String decString = "DEC  " + Integer.toString(answer);
+				dec.setText(decString);
+				String binAns = getBin(Integer.toString(answer));
+				String binString = "BIN   " + binAns;
+				bin.setText(binString);
+				
+			}
+		});
+		letter_e.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				displayText.setText("E");
+			}
+		});
+		letter_f.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				displayText.setText("F");
+			}
+		});
+		one.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				//numBuilder.append("1");
+				//String screen = numBuilder.toString();
+				//displayText.setText(screen);
+				//keys.add('1');
+				entry.append("1");
+				displayText.setText(entry.toString());
+			}
+		});
+		two.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				//numBuilder.append("2");
+				//String screen = numBuilder.toString();
+				//displayText.setText(screen);
+				//keys.add('2');
+				entry.append("2");
+				displayText.setText(entry.toString());
+			}
+		});
+		three.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				//numBuilder.append("3");
+				//String screen = numBuilder.toString();
+				//displayText.setText(screen);
+				//keys.add('3');
+				entry.append("3");
+				displayText.setText(entry.toString());
+			}
+		});
+		plus.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				/*
+				String entry1 = numBuilder.toString();
+				double entryValue = Double.parseDouble(entry1);
+				nums.add(entryValue);
+				numBuilder.setLength(0);
+				operators.add("plus");
+				keys.add('+');
+				*/
+				entry.append("+");
+				displayText.setText(entry.toString());
+			}
+		});
+		letter_c.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				displayText.setText("C");
+			}
+		});
+		letter_d.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				displayText.setText("D");
+			}
+		});
+		four.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				/*
+				numBuilder.append("4");
+				String screen = numBuilder.toString();
+				displayText.setText(screen);
+				keys.add('4');
+				*/
+				entry.append("4");
+				displayText.setText(entry.toString());
+			}
+		});
+		five.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				/*
+				numBuilder.append("5");
+				String screen = numBuilder.toString();
+				displayText.setText(screen);
+				keys.add('5');
+				*/
+				entry.append("5");
+				displayText.setText(entry.toString());
+			}
+		});
+		six.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				/*
+				numBuilder.append("6");
+				String screen = numBuilder.toString();
+				displayText.setText(screen);
+				keys.add('6');
+				*/
+				entry.append("6");
+				displayText.setText(entry.toString());
+			}
+		});
+		minus.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				/*
+				String entry1 = numBuilder.toString();
+				double entryValue = Double.parseDouble(entry1);
+				nums.add(entryValue);
+				numBuilder.setLength(0);
+				operators.add("minus");
+				keys.add('-');
+				*/
+				entry.append("-");
+				displayText.setText(entry.toString());
+			}
+		});
+		letter_a.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				displayText.setText("A");
+			}
+		});
+		letter_b.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				displayText.setText("B");
+			}
+		});
+		seven.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				/*
+				numBuilder.append("7");
+				String screen = numBuilder.toString();
+				displayText.setText(screen);
+				keys.add('7');
+				*/
+				entry.append("7");
+				displayText.setText(entry.toString());
+			}
+		});
+		eight.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				/*
+				numBuilder.append("8");
+				String screen = numBuilder.toString();
+				displayText.setText(screen);
+				keys.add('8');
+				*/
+				entry.append("8");
+				displayText.setText(entry.toString());
+			}
+		});
+		nine.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				/*
+				numBuilder.append("9");
+				String screen = numBuilder.toString();
+				displayText.setText(screen);
+				keys.add('9');
+				*/
+				entry.append("9");
+				displayText.setText(entry.toString());
+			}
+		});
+		multiply.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				/*
+				String entry1 = numBuilder.toString();
+				double entryValue = Double.parseDouble(entry1);
+				nums.add(entryValue);
+				numBuilder.setLength(0);
+				operators.add("multiply");
+				keys.add('*');
+				*/
+				entry.append("*");
+				displayText.setText(entry.toString());
+			}
+		});
+		up_arrow.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				displayText.setText("↑");
+			}
+		});
+		mod.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				/*
+				String entry1 = numBuilder.toString();
+				double entryValue = Double.parseDouble(entry1);
+				nums.add(entryValue);
+				numBuilder.setLength(0);
+				operators.add("mod");
+				keys.add('%');
+				*/
+				entry.append("%");
+				displayText.setText(entry.toString());
+			}
+		});
+		c.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				displayText.setText(" ");
+				entry.setLength(0);
+				entry.trimToSize();
+				hex.setText("HEX  0");
+				bin.setText("BIN   0");
+				oct.setText("OCT  0");
+				dec.setText("DEC  0");
+			}
+		});
+		ce.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				displayText.setText(" ");
+				//nums.clear();
+				//operators.clear();
+				entry.setLength(0);
+				entry.trimToSize();
+				hex.setText("HEX  0");
+				bin.setText("BIN   0");
+				oct.setText("OCT  0");
+				dec.setText("DEC  0");
+			}
+		});
+		backspace.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				entry.setLength(entry.length() - 1);
+				String screen = entry.toString();
+				displayText.setText(screen);
+			}
+		});
+		divide.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				/*
+				String entry1 = numBuilder.toString();
+				double entryValue = Double.parseDouble(entry1);
+				nums.add(entryValue);
+				operators.add("divide");
+				keys.add('/');
+				*/
+				entry.append("/");
+				displayText.setText(entry.toString());
+			}
+		});
+		lsh.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				displayText.setText("Lsh");
+			}
+		});
+		rsh.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				displayText.setText("Rsh");
+			}
+		});
+		or.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				displayText.setText("or");
+			}
+		});
+		xor.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				displayText.setText("and/or");
+			}
+		});
+		not.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				displayText.setText("!");
+			}
+		});
+		and.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				displayText.setText("&");
+			}
+		});
+		
+		// Create title and menu button display
+		HBox titlebox = new HBox();
+		titlebox.setSpacing(5);
+		titlebox.setAlignment(Pos.TOP_LEFT);
+		titlebox.setPadding(new Insets(10,0,10,10));
+		titlebox.setBackground(new Background(new BackgroundFill(Color.LIGHTGREY, CornerRadii.EMPTY, Insets.EMPTY)));
+		
+		// Create "PROGRAMMER" label
+		Label programmer = new Label("  PROGRAMMER");
+		programmer.setFont(Font.font("Tahoma", 14));
+		
+		// Add image
+		Image image = new Image("https://image.flaticon.com/icons/png/512/56/56763.png");
+		ImageView imageview = new ImageView(image);
+		imageview.setFitHeight(15);
+		imageview.setFitWidth(15);
+		imageview.setPreserveRatio(true);
+		
+		
+		titlebox.getChildren().addAll(imageview,programmer);
+		
+		// Create an HBox to hold output/input display
+		HBox displaybox = new HBox();
+		//displaybox.setSpacing(175);
+		displaybox.setPrefHeight(300);
+		displaybox.setAlignment(Pos.TOP_RIGHT);
+		displaybox.setPadding(new Insets(0,10,0,0));
+		displaybox.setBackground(new Background(new BackgroundFill(Color.LIGHTGREY, CornerRadii.EMPTY, Insets.EMPTY)));
+		
+		displayText.setStyle("-fx-font-size: 24");
+		displayText.setTextAlignment(TextAlignment.RIGHT);
+		
+		// Add input/output text to display box
+		displaybox.getChildren().addAll(displayText);
+		
+		// Create hex/dec/oct/bin display
+		VBox hexDisplay = new VBox();
+		hexDisplay.setPrefWidth(275);
+		hexDisplay.setAlignment(Pos.BOTTOM_LEFT);
+		hexDisplay.setBackground(new Background(new BackgroundFill(Color.LIGHTGREY, CornerRadii.EMPTY, Insets.EMPTY)));
+		
+		hex.getStylesheets().add("Style3.css");
+		dec.getStylesheets().add("Style3.css");
+		oct.getStylesheets().add("Style3.css");
+		bin.getStylesheets().add("Style3.css");
+		
+		hex.setAlignment(Pos.TOP_LEFT);
+		dec.setAlignment(Pos.TOP_LEFT);
+		oct.setAlignment(Pos.TOP_LEFT);
+		bin.setAlignment(Pos.TOP_LEFT);
+		
+		hex.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				String expression = entry.toString();
+				String hexadecimal = getHex(expression);
+				displayText.setText(hexadecimal);
+			}
+		});
+		
+		dec.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				displayText.setText(entry.toString());
+			}
+		});
+		
+		oct.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				String expression = entry.toString();
+				String octal = getOct(expression);
+				displayText.setText(octal);
+			}
+		});
+		
+		bin.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				String expression = entry.toString();
+				String binary = getBin(expression);
+				displayText.setText(binary);
+			}
+		});
+		
+		hexDisplay.setPadding(new Insets(0,0,5,10));
+		hexDisplay.getChildren().addAll(hex,dec,oct,bin);
+		
+		
+		// Add everything to VBox
+		vbox.getChildren().addAll(titlebox,displaybox,hexDisplay,grid);
+		
+		// Create scene and place it in the stage
+		Scene scene = new Scene(vbox,275,475);
+		window.setScene(scene);
+		window.sizeToScene();
+		window.show();
+		
+	}
+}
+
