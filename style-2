@@ -1,0 +1,9 @@
+.button {
+    -fx-background-color: silver;
+    -fx-font-size: 10;
+}
+
+.button:hover
+{
+    -fx-background-color: lightskyblue;
+}
