@@ -1,6 +1,33 @@
 public class Model extends Application {
-  public static void main(String[] args) {
+        public static void main(String[] args) {
 		launch(args);
 	}
 
+        public void start(Stage window) {
+                // See calculator/gui-button-controls
+        }
+        
+        public static int evaluateExpression(String expression) {
+                // See calculator/evaluate
+        }
+        
+        public static void processOperator(Stack<Integer> operandStack, Stack<Character> operatorStack) {
+                // See calculator/evaluate
+        }
+        
+        public static String insertBlanks(String s) {
+                // See calculator/evaluate
+        }
+        
+        public static String getHex(String s) {
+                // See calculator/convert
+        }
+        
+        public static String getOct(String s) {
+                // See calculator/convert
+        }
+        
+        public static String getBin(String s) {
+                // See calculator/convert
+        }
 }
