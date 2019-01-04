@@ -1,0 +1,19 @@
+// Functions to convert between different units
+
+public static String getHex(String s) {
+		int answer = Integer.parseInt(s);
+		String hexadecimal = Integer.toHexString(answer);
+		return hexadecimal.toUpperCase();
+	}
+	
+	public static String getOct(String s) {
+		int answer = Integer.parseInt(s);
+		String octal = Integer.toOctalString(answer);
+		return octal;
+	}
+	
+	public static String getBin(String s) {
+		int answer = Integer.parseInt(s);
+		String binary = Integer.toBinaryString(answer);
+		return binary;
+	}
