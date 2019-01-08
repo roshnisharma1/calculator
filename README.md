@@ -5,6 +5,8 @@ Description:
 
 IDE used: Eclipse
 
+Packages used: application
+
 Libraries used:
   javafx.event.ActionEvent;
   javafx.event.EventHandler;
