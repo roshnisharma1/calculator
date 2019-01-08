@@ -29,11 +29,4 @@ Libraries used:
   javafx.scene.layout.BackgroundFill;
   javafx.scene.layout.CornerRadii;
 
-Files included:
-  driver: Runs the program.
-  evaluate: To evaluate user input expression.
-  convert: To convert value to different unit.
-  gui-buttons-function: The GUI framework plus button controls.
-  style1: CSS style sheet for GUI.
-  style2: CSS style sheet for GUI.
-  style3: CSS style sheet for GUI.
+Files included: driver, evaluate, convert, gui-buttons-function, style1, style2, style3
